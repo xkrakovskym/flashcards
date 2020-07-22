@@ -1,91 +1,119 @@
 package flashcards;
 
-import java.text.MessageFormat;
+import java.util.List;
 
 public class DisplayUtils {
 
-    public static void mainMenuText() {
-        System.out.println("Input the action (add, remove, import, export, ask, exit):");
+    public static String displayAndReturn(String toOutput){
+        System.out.println(toOutput);
+        return toOutput;
     }
 
-    public static void cardInputText() {
-        System.out.println("The card:");
+    public static String  mainMenuText() {
+        return displayAndReturn(
+                "Input the action (add, remove, import, export, " +
+                        "ask, exit, log, hardest card, reset stats):");
     }
 
-    public static void cardDefinitionInputText() {
-        System.out.println("The definition of the card:");
+    public static String cardInputText() {
+        return displayAndReturn("The card:");
     }
 
-    public static void cardAskText(String definition) {
-        System.out.print(String.format("Print the definition of \"%s\": \n> ", definition));
+    public static String cardDefinitionInputText() {
+        return displayAndReturn("The definition of the card:");
     }
 
-    public static void correctAnswerText() {
-        System.out.println("Correct answer!");
+    public static String cardAskText(String definition) {
+        return displayAndReturn(String.format("Print the definition of \"%s\":", definition));
     }
 
-    public static void incorrectAnswerText(String definition) {
-        System.out.print(MessageFormat.format("Wrong answer. The correct one is \"{0}\".\n",
+    public static String correctAnswerText() {
+        return displayAndReturn("Correct answer!");
+    }
+
+    public static String incorrectAnswerText(String definition) {
+        return displayAndReturn(String.format("Wrong answer. The correct one is \"%s\".\n",
                 definition));
     }
 
-    public static void termAlreadyExistsText(String term) {
-        System.out.println(String.format("The card \"%s\" already exists.\n",
+    public static String termAlreadyExistsText(String term) {
+        return displayAndReturn(String.format("The card \"%s\" already exists.\n",
                 term));
     }
 
-    public static void definitionAlreadyExistsText(String definition) {
-        System.out.println(String.format("The definition \"%s\" already exists.\n",
+    public static String definitionAlreadyExistsText(String definition) {
+        return displayAndReturn(String.format("The definition \"%s\" already exists.\n",
                 definition));
     }
 
-    public static void incorrectAnswerDefinitionExistsText(String correctDefinition, String guessedTerm) {
-        System.out.println(MessageFormat.format("Wrong answer. The correct one is \"{0}\", you''ve just written the" +
-                " definition of \"{1}\".", correctDefinition, guessedTerm));
+    public static String incorrectAnswerDefinitionExistsText(String correctDefinition, String guessedTerm) {
+        return displayAndReturn(String.format("Wrong answer. The correct one is \"%s\", you've just written the" +
+                " definition of \"%s\".", correctDefinition, guessedTerm));
     }
 
-    public static void incorrectInputText() {
-        System.out.println("Wrong input, please use one of these commands: add, remove, import, ask, exit");
+    public static String incorrectInputText() {
+        return displayAndReturn("Wrong input, please use one of these commands: add, remove, import, ask, exit");
     }
 
-    public static void exitText() {
-        System.out.println("Bye bye!");
+    public static String exitText() {
+        return displayAndReturn("Bye bye!");
     }
 
-    public static void cardWasRemovedText(){
-        System.out.println("The card has been removed.\n");
+    public static String cardWasRemovedText(){
+        return displayAndReturn("The card has been removed.\n");
     }
 
-    public static void cardWasNotRemovedText(String term){
-        System.out.println(String.format("Can\'t remove \"%s\": there is no such card.\n",
+    public static String cardWasNotRemovedText(String term){
+        return displayAndReturn(String.format("Can't remove \"%s\": there is no such card.\n",
                 term));
     }
 
-    public static void askHowManyTimeText(){
-        System.out.println("How many times to ask?");
+    public static String askHowManyTimeText(){
+        return displayAndReturn("How many times to ask?");
     }
 
-    public static void wrongFormatInputText(){
-        System.out.println("Wrong input!");
+    public static String fileNameText(){
+        return displayAndReturn("File name:");
     }
 
-    public static void fileNameText(){
-        System.out.println("File name:");
+    public static String fileErrorText(){
+        return displayAndReturn("File not found.");
     }
 
-    public static void fileErrorText(){
-        System.out.println("File not found.");
+    public static String cardAddedText(String term, String definition) {
+        return displayAndReturn(String.format("The pair (\"%s\":\"%s\") has been added.\n", term, definition));
     }
 
-    public static void cardAddedText(String term, String definition) {
-        System.out.println(String.format("The pair (\"%s\":\"%s\") has been added.\n", term, definition));
+    public static String exportCardsText(Integer numOfCards){
+        return displayAndReturn(String.format("%d cards have been saved", numOfCards));
     }
 
-    public static void savedCardsText(int numOfCards){
-        System.out.println(String.format("%d cards have been saved", numOfCards));
+    public static String importCardsText(Integer numOfCards){
+        return displayAndReturn(String.format("%d cards have been loaded", numOfCards));
     }
 
-    public static void loadedCardsText(int numOfCards){
-        System.out.println(String.format("%d cards have been loaded", numOfCards));
+    public static String savedLogText(){
+        return displayAndReturn("The log has been saved.");
+    }
+
+    public static String noHardestCardText() {
+        return displayAndReturn("There are no cards with errors.\n");
+    }
+
+    public static String hardestCardText(String term, Integer numOfMistakes) {
+        return displayAndReturn(String.format("The hardest card is %s. You have %d errors answering it.", term, numOfMistakes));
+    }
+
+    public static String hardestCardsText(List<String> hardestCards, Integer numOfMistakes){
+        String joinedTerms = String.join(", ", hardestCards);
+        return displayAndReturn(String.format("The hardest cards are %s. You have %d errors answering them.", joinedTerms, numOfMistakes));
+    }
+
+    public static String resetStatsText() {
+        return displayAndReturn("Card statistics has been reset.\n");
+    }
+
+    public static void wrongInputArgumentsText() {
+        System.out.println("Wrong input arguments provided");
     }
 }

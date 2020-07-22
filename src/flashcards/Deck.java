@@ -1,30 +1,26 @@
 package flashcards;
 
-import java.util.HashMap;
+import javafx.util.Pair;
+
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.io.Serializable;
 
-public class Deck implements Serializable {
+public class Deck {
 
     private Map<String, String> termMap;
     private Map<String, String> definitionMap;
     private transient Iterator<Map.Entry<String, String>> deckIterator; // transient to exclude from Serialization
     private int timesToAsk;
     private int deckSize;
-    private flashcards.StateMachine state;
     private String currentTerm;
-    private static final long serialVersionUID = 1452525600079957398L;
-    private static final boolean savedAsObject = true;
 
     public Deck() {
-        this.termMap = new HashMap<>();
-        this.definitionMap = new HashMap<>();
         this.timesToAsk = 0;
         termMap = new LinkedHashMap<>();
         definitionMap = new LinkedHashMap<>();
-        state = flashcards.StateMachine.MAIN_MENU;
     }
 
     public void add(Map<String, String> termMapToAdd){
@@ -44,10 +40,11 @@ public class Deck implements Serializable {
         return definitionMap.containsKey(definition);
     }
 
-    public void addCard(String term, String definition){
-        termMap.put(term, definition);
-        definitionMap.put(definition, term);
+    public String addCard(String definition){
+        termMap.put(currentTerm, definition);
+        definitionMap.put(definition, currentTerm);
         ++deckSize;
+        return currentTerm;
     }
 
     public boolean removeCard(String term){
@@ -68,14 +65,6 @@ public class Deck implements Serializable {
     }
     public Map<String, String> getDefinitionMap() {
         return definitionMap;
-    }
-
-    public void setState(flashcards.StateMachine state) {
-        this.state = state;
-    }
-
-    public flashcards.StateMachine getState() {
-        return state;
     }
 
     public void setCurrentTerm(String currentTerm) {
@@ -106,7 +95,20 @@ public class Deck implements Serializable {
         return deckSize;
     }
 
-    public static boolean isSavedAsObject() {
-        return savedAsObject;
+    public boolean addTerm(String input) {
+        currentTerm = input;
+        return !termExists(input);
+    }
+
+    public void saveTermMap(ObjectOutputStream out) throws IOException {
+        out.writeObject(termMap);
+    }
+
+    public Pair<String, String> giveCurrentCard() {
+        return new Pair<>(currentTerm, termMap.get(currentTerm));
+    }
+
+    public String getTermForDefinition(String input) {
+        return definitionMap.get(input);
     }
 }
