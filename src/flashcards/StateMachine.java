@@ -2,9 +2,7 @@ package flashcards;
 
 import javafx.util.Pair;
 import java.io.*;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 
 public enum StateMachine {
@@ -133,7 +131,7 @@ public enum StateMachine {
 
         @Override
         public void moveOn(Game game, String input) {
-            Pair<String, String> askedCard = game.getAskedCard();
+            Pair<String, String> askedCard = game.getCurrentCard();
             String correctDefinition = askedCard.getValue();
             if (correctDefinition.equalsIgnoreCase(input)) {
                 Logger.log(DisplayUtils.correctAnswerText());
@@ -149,7 +147,6 @@ public enum StateMachine {
             }
         }
     },
-
     EXIT {
         @Override
         public void menuText(Game game) {

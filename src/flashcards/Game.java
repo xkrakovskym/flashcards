@@ -6,21 +6,22 @@ import java.io.*;
 import java.util.*;
 
 public class Game {
-    private List<String> logList;
-    private StateMachine state;
     private Deck deck;
+    private StateMachine state;
+    private String currentTerm;
+    private int timesToAsk;
     private Map<String, Integer> cardStatistics;
     private String exportFileName;
 
     public Game(String inputFileName, String exportFileName) {
         this.cardStatistics = new HashMap<>();
-        this.logList = new ArrayList<>();
         this.deck = new Deck();
-        state = StateMachine.MAIN_MENU;
+        this.state = StateMachine.MAIN_MENU;
         this.exportFileName = exportFileName;
+        this.timesToAsk = 0;
 
         if (inputFileName != null){
-            state.IMPORT_FILE.moveOn(this ,inputFileName); // this is ugly, but trying not to use logger in game
+            StateMachine.IMPORT_FILE.moveOn(this ,inputFileName);
         }
     }
 
@@ -77,7 +78,7 @@ public class Game {
             termMapToImport = (LinkedHashMap) in.readObject();
             in.close();
             fileIn.close();
-            deck.add(termMapToImport);
+            deck.addDeck(termMapToImport);
             numOfCardsImported =termMapToImport.entrySet().size();
         } catch (IOException | ClassNotFoundException exception) {
             exception.printStackTrace();
@@ -116,21 +117,22 @@ public class Game {
     }
 
     public boolean processTerm(String input) {
+        currentTerm = input;
         return deck.addTerm(input);
     }
 
     public String processDefinition(String input) {
-        String termAdded = null;
         if (!deck.definitionExists(input)){
-            termAdded = deck.addCard(input);
+            deck.addCard(currentTerm, input);
+        } else {
+            currentTerm = null;
         }
-        return termAdded;
+        return currentTerm;
     }
 
     public void ask(String input) throws NumberFormatException {
-        int timesToAsk = Integer.parseInt(input);
+        timesToAsk = Integer.parseInt(input);
         if (timesToAsk > 0) {
-            deck.setTimesToAsk(timesToAsk);
             deck.initDealing();
             transitionToState(StateMachine.ASK_DEFINITION);
         } else {
@@ -139,22 +141,20 @@ public class Game {
     }
 
     public String askDefinition() {
-        String askedTerm = null;
-        int timesToAsk = deck.getTimesToAsk();
-        if (timesToAsk > 0 && !deck.getTermMap().isEmpty()) {
+        currentTerm = null;
+        if (timesToAsk > 0 && !deck.isEmpty()) {
             if (!deck.getDeckIterator().hasNext()) {
                 deck.initDealing();
             }
             Map.Entry<String, String> entry = deck.getDeckIterator().next();
-            askedTerm = entry.getKey();
-            deck.setCurrentTerm(entry.getKey());
-            deck.setTimesToAsk(--timesToAsk);
+            currentTerm = entry.getKey();
+            --timesToAsk;
         }
-        return askedTerm;
+        return currentTerm;
     }
 
-    public Pair<String, String> getAskedCard() {
-        return deck.giveCurrentCard();
+    public Pair<String, String> getCurrentCard() {
+        return new Pair<> (currentTerm, deck.getDefinitionForTerm(currentTerm));
     }
 
     public boolean definitionExists(String input) {
