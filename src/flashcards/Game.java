@@ -1,20 +1,16 @@
 package flashcards;
 
-import javafx.util.Pair;
-
-import java.io.*;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class Game {
     private Deck deck;
     private StateMachine state;
     private String currentTerm;
     private int timesToAsk;
-    private Map<String, Integer> cardStatistics;
     private String exportFileName;
 
     public Game(String inputFileName, String exportFileName) {
-        this.cardStatistics = new HashMap<>();
         this.deck = new Deck();
         this.state = StateMachine.MAIN_MENU;
         this.exportFileName = exportFileName;
@@ -26,19 +22,7 @@ public class Game {
     }
 
     public Pair<Integer, List<String>> hardestCards() {
-        int maxMistakes = 0;
-        for (var entry : cardStatistics.entrySet()) {
-            if (entry.getValue() > maxMistakes) {
-                maxMistakes = entry.getValue();
-            }
-        }
-        List<String> hardestCards = new ArrayList<>();
-        for (var entry : cardStatistics.entrySet()) {
-            if (entry.getValue().equals(maxMistakes)) {
-                hardestCards.add("\"" + entry.getKey() + "\"");
-            }
-        }
-        return new Pair<>(maxMistakes, hardestCards);
+        return deck.getHardestCards();
     }
 
     public void transitionToState(StateMachine state) {
@@ -58,32 +42,15 @@ public class Game {
     }
 
     public void addMistake(String currentTerm) {
-        Integer previousValue = cardStatistics.putIfAbsent(currentTerm, 1);
-        if (previousValue != null) {
-            cardStatistics.put(currentTerm, ++previousValue);
-        }
+        deck.addMistake(currentTerm);
     }
 
     public void resetStats() {
-        cardStatistics.clear();
+        deck.resetStats();
     }
 
     public Integer importFromObject(String input) {
-        Map<String, String> termMapToImport;
-        Integer numOfCardsImported = null;
-        try {
-            FileInputStream fileIn = new FileInputStream(input);
-            ObjectInputStream in = new ObjectInputStream(fileIn);
-            cardStatistics = (HashMap) in.readObject();
-            termMapToImport = (LinkedHashMap) in.readObject();
-            in.close();
-            fileIn.close();
-            deck.addDeck(termMapToImport);
-            numOfCardsImported =termMapToImport.entrySet().size();
-        } catch (IOException | ClassNotFoundException exception) {
-            exception.printStackTrace();
-        }
-        return numOfCardsImported;
+        return deck.importFromObject(input);
     }
 
     public Integer exportToObject(String input) {
@@ -92,28 +59,13 @@ public class Game {
             input = exportFileName;
         }
         if (input != null) {
-            try {
-                FileOutputStream fileOut = new FileOutputStream(input);
-                ObjectOutputStream out = new ObjectOutputStream(fileOut);
-                out.writeObject(cardStatistics);
-                deck.saveTermMap(out); // is this OKAY?!?!?
-                out.close();
-                fileOut.close();
-                numOfCardsExported = deck.getDeckSize();
-            } catch (IOException exception) {
-                exception.printStackTrace();
-            }
+            numOfCardsExported = deck.exportToObject(input);
         }
         return numOfCardsExported;
     }
 
     public boolean processRemove(String input){
-        if (deck.removeCard(input)) {
-            cardStatistics.remove(input);
-            return true;
-        } else {
-            return false;
-        }
+        return deck.removeCard(input);
     }
 
     public boolean processTerm(String input) {

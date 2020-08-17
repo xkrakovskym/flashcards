@@ -1,7 +1,6 @@
 package flashcards;
 
-import javafx.util.Pair;
-import java.io.*;
+import java.io.IOException;
 import java.util.List;
 
 
@@ -155,6 +154,7 @@ public enum StateMachine {
         @Override
         public void moveOn(Game game, String input) {
         }
+
         @Override
         public boolean isRunning(Game game) {
             Logger.log(DisplayUtils.exitText());
@@ -191,12 +191,12 @@ public enum StateMachine {
             Integer numOfMistakes = hardestCardsStats.getKey();
 
             if (numOfMistakes.equals(0)) {
-                DisplayUtils.noHardestCardText();
+                Logger.log(DisplayUtils.noHardestCardText());
             } else if (hardestCards.size() == 1){
-                DisplayUtils.hardestCardText(hardestCards.get(0), numOfMistakes);
+                Logger.log(DisplayUtils.hardestCardText(hardestCards.get(0), numOfMistakes));
             }
             if (hardestCards.size() > 1){
-                DisplayUtils.hardestCardsText(hardestCards, numOfMistakes);
+                Logger.log(DisplayUtils.hardestCardsText(hardestCards, numOfMistakes));
             }
             game.transitionToState(StateMachine.MAIN_MENU);
             Logger.log(DisplayUtils.mainMenuText());
